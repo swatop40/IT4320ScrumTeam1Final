@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+    <title>{% block title %} {% endblock %} - FlaskApp</title>
+    <style>
+        .post {
+            padding: 10px;
+            margin: 5px;
+            background-color: #f3f3f3
+        }
+
+        nav a {
+            color: #d64161;
+            font-size: 3em;
+            margin-left: 50px;
+            text-decoration: none;
+        }
+
+        .alert {
+            padding: 20px;
+            margin: 5px;
+            color: #970020;
+            background-color: #ffd5de;
+        }
+    </style>
+</head>
+<body>
+    
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="#">Admin</a>
+            <a href="#">Reservations</a>
+        </nav>
+        <hr>
+        <div class="content">
+            {% for message in get_flashed_messages() %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+
+            {% block content %} {% endblock %}
+        </div>
+    
+        <hr>
+
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container" style="margin-top: 40px;">
+    <div class="box" style="max-width: 500px; margin: auto; padding: 30px;">
+
+        <h1 class="title" style="text-align: center;">IT4320 Trip Reservation System</h1>
+
+        <form action="{{ url_for('index') }}" method="POST">
+            <div class="text-align: center;">
+                <label class="label">
+                    Welcome to the IT-4320 Reservation System. Use the select box to choose whether
+                    to make a reservation or log in as administrator.
+                </label>
+            </div>
+
+            <div class="field">
+                <label class="label">Choose an Option</label>
+                <div class="control">
+                    <div class="select is-fullwidth">
+                        <select name="menu_choice">
+                            <option value="option1">Choose an Option</option>
+                            <option value="option2">Admin Login</option>
+                            <option value="option3">Reserve a Seat</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field" style="text-align: center; margin-top: 20px;">
+                <button class="button is-primary is-medium" type="submit">Submit</button>
+            </div>
+        </form>
+
+        <hr>
+
+        <h2 class="title is-4" style="text-align:center;">Current Seating Chart</h2>
+
+        <div style="font-family: monospace; font-size: 1.2em;">
+            {% for row in chart %}
+                {% set row_text = [] %}
+                {% for seat in row %}
+                    {% if seat.reserved %}
+                        {% set _ = row_text.append('X') %}
+                    {% else %}
+                        {% set _ = row_text.append('O') %}
+                    {% endif %}
+                {% endfor %}
+                {{ row_text }}<br>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
