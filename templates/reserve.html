@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Reserve Seat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Reserve a Seat</h1>
+    <nav>
+      <a href="index.html">Main Menu</a> |
+      <a href="{{ url_for('admin_login') }}">Admin Login</a>
+    </nav>
+    <hr>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=false) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <label>First name: <input name="first_name" required></label><br>
+      <label>Last name: <input name="last_name" required></label><br>
+      <label>Row (1-12): <input name="seat_row" type="number" min="1" max="12" required></label><br>
+      <label>Column (1-4): <input name="seat_col" type="number" min="1" max="4" required></label><br>
+      <button type="submit">Reserve Seat</button>
+    </form>
+
+    <h2>Current Seating</h2>
+    <table class="chart">
+      <thead><tr><th>Row</th>{% for c in range(1, cols+1) %}<th>C{{c}}</th>{% endfor %}</tr></thead>
+      <tbody>
+      {% for r in range(0, rows) %}
+        <tr>
+          <td>{{ r+1 }}</td>
+          {% for c in range(0, cols) %}
+            {% set seat = chart[r][c] %}
+            <td class="{{ 'reserved' if seat.reserved else 'available' }}">
+              {% if seat.reserved %}
+                {{ seat.name }}<br>
+                <small>Occupied</small>
+              {% else %}
+                Available<br>
+                <small>${{ "%.2f"|format(cost_matrix[r][c]) }}</small>
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+  </main>
+</body>
+</html>
