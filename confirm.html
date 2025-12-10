@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Reservation Confirmed</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Reservation Confirmation</h1>
+    <nav><a href="{{ url_for('index') }}">Main Menu</a> | <a href="{{ url_for('reserve_seat') }}">Make another</a></nav>
+    <hr>
+  </header>
+
+  <main>
+    <h2>Thank you, {{ res.passengerName }}!</h2>
+    <p>Seat: Row {{ res.seatRow }}, Column {{ res.seatColumn }}</p>
+    <p>eTicket Number: <strong>{{ res.eTicketNumber }}</strong></p>
+    <p>Price: <strong>${{ "%.2f"|format(price) }}</strong></p>
+    <p>Created: {{ res.created }}</p>
+
+    <button onclick="window.print()">Print this confirmation</button>
+  </main>
+</body>
+</html>
