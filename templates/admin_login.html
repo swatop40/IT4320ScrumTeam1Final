@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<div class="container" style="margin-top: 40px;">
+    <div class="box" style="max-width: 900px; margin: auto; padding: 30px;">
     {% if admin_verified %}
     <h1>Administrator Panel</h1>
     <h2>Seating Chart</h2>
@@ -23,19 +24,21 @@
         <h2>Reservation List</h2>
         <div>
             {% for r in reservations %}
+            <div class="box" style="margin-bottom: 15px;">
                 <span>
                     {{ r.passengerName }}: Row {{ r.seatRow + 1}} Seat {{ r.seatColumn + 1}} Ticket Confirmation: {{ r.eTicketNumber }}<br>
                 </span>
                 <form method ="POST" action="{{ url_for('delete_reservation', res_id=r.id) }}">
                     <button type=""submit>Delete Reservation</button>
                 </form>
+            </div>
 
             {% endfor %}
         </div>
     {% endif %}
 
 
-    <div class="Admin Login">
+    <div class="Admin_Login" style="max-width: 400px; margin: 20px;">
         <form method="POST">
             <h1>Administrator Login</h1>
             <b>Username</b><br>
@@ -46,4 +49,6 @@
         </form>
 
     </div>
+    </div>
+</div>
 {% endblock %}
