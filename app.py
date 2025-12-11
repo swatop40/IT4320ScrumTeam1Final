@@ -30,6 +30,10 @@ class Admin(db.Model):
     username = db.Column(db.String, primary_key=True)
     password = db.Column(db.String, nullable=False)
 
+def get_cost_matrix():
+    cost_matrix = [[100, 75, 50, 100] for row in range(12)]
+    return cost_matrix
+
 
 def build_seating_chart():
     # Create empty 12x4 chart
@@ -39,19 +43,22 @@ def build_seating_chart():
     reservations = Reservation.query.all()
 
     for r in reservations:
-        row = r.seatRow - 1   # convert to 0-based index
-        col = r.seatColumn - 1
+        row = r.seatRow 
+        col = r.seatColumn 
 
         seating_chart[row][col]["reserved"] = True
         seating_chart[row][col]["name"] = r.passengerName
 
-    return seating_chart
+    cost_matrix = get_cost_matrix()
+    revenue = sum(cost_matrix[row][col] for row in range(12) for col in range(4) if seating_chart[row][col]["reserved"])
+
+    return seating_chart, revenue, reservations
 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     # Build seating chart for display on main page
-    chart = build_seating_chart()
+    chart, revenue, reservations = build_seating_chart()
 
     if request.method == "POST":
         choice = request.form.get("menu_choice")
@@ -75,6 +82,8 @@ def index():
 @app.route("/admin", methods=["GET", "POST"] )
 def admin_login():
     #return "<h1>Admin Login Page Placeholder</h1>"
+    admin_verified = False
+    seating_chart, revenue, reservations = None, 0, []
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -88,9 +97,25 @@ def admin_login():
                 flash("Password Required")
         elif adminUser and adminUser.password == password:
             flash("Login Sucessful")
+            admin_verified = True
+            print(admin_verified)
+            seating_chart, revenue, reservations = build_seating_chart()
         else:
             flash("Invalid Credentials")
-    return render_template("admin_login.html")
+    chart = seating_chart
+    return render_template("admin_login.html", admin_verified = admin_verified, seating_chart = seating_chart, chart = chart, revenue = revenue, reservations = reservations, cost_matrix = get_cost_matrix())
+
+@app.route("/admin/delete/<int:res_id>", methods=["POST"])
+def delete_reservation(res_id):
+    reservation = Reservation.query.get(res_id)
+    db.session.delete(reservation)
+    db.session.commit()
+    flash("Successfully deleted")
+    return redirect(url_for("admin_login"))
+
+
+
+
 
 
 @app.route("/reserve")

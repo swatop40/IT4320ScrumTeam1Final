@@ -1,6 +1,40 @@
 {% extends 'base.html' %}
 
-    {% block content %}
+{% block content %}
+
+    {% if admin_verified %}
+    <h1>Administrator Panel</h1>
+    <h2>Seating Chart</h2>
+        <div style="font-family: monospace; font-size: 1.2em;">
+            {% for row in chart %}
+                {% set row_text = [] %}
+                {% for seat in row %}
+                    {% if seat.reserved %}
+                        {% set _ = row_text.append('X') %}
+                    {% else %}
+                        {% set _ = row_text.append('O') %}
+                    {% endif %}
+                {% endfor %}
+                {{ row_text }}<br>
+            {% endfor %}
+        </div>
+
+        <h2>Revenue: ${{ revenue }}</h2>
+        <h2>Reservation List</h2>
+        <div>
+            {% for r in reservations %}
+                <span>
+                    {{ r.passengerName }}: Row {{ r.seatRow + 1}} Seat {{ r.seatColumn + 1}} Ticket Confirmation: {{ r.eTicketNumber }}<br>
+                </span>
+                <form method ="POST" action="{{ url_for('delete_reservation', res_id=r.id) }}">
+                    <button type=""submit>Delete Reservation</button>
+                </form>
+
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
     <div class="Admin Login">
         <form method="POST">
             <h1>Administrator Login</h1>
@@ -12,4 +46,4 @@
         </form>
 
     </div>
-    {% endblock %}
+{% endblock %}
