@@ -72,9 +72,25 @@ def index():
 
 
 
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"] )
 def admin_login():
-    return "<h1>Admin Login Page Placeholder</h1>"
+    #return "<h1>Admin Login Page Placeholder</h1>"
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        adminUser = Admin.query.filter_by(username=username).first()
+
+        if not username and not password:
+            flash("Username and Password Required")
+        elif not username:
+            flash("Username Required")
+        elif not password:
+                flash("Password Required")
+        elif adminUser and adminUser.password == password:
+            flash("Login Sucessful")
+        else:
+            flash("Invalid Credentials")
+    return render_template("admin_login.html")
 
 
 @app.route("/reserve")
