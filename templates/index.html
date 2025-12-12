@@ -31,25 +31,6 @@
                 <button class="button is-primary is-medium" type="submit">Submit</button>
             </div>
         </form>
-
-        <hr>
-
-        <h2 class="title is-4" style="text-align:center;">Current Seating Chart</h2>
-
-        <div style="font-family: monospace; font-size: 1.2em;">
-            {% for row in chart %}
-                {% set row_text = [] %}
-                {% for seat in row %}
-                    {% if seat.reserved %}
-                        {% set _ = row_text.append('X') %}
-                    {% else %}
-                        {% set _ = row_text.append('O') %}
-                    {% endif %}
-                {% endfor %}
-                {{ row_text }}<br>
-            {% endfor %}
-        </div>
-
     </div>
 </div>
 

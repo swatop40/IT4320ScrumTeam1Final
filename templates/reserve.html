@@ -1,63 +1,95 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Reserve Seat</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <header>
-    <h1>Reserve a Seat</h1>
-    <nav>
-      <a href="{{url_for('index')}}">Main Menu</a> |
-      <a href="{{ url_for('admin_login') }}">Admin Login</a>
-    </nav>
-    <hr>
-  </header>
+{% extends "base.html" %}
 
-  <main>
-    {% with messages = get_flashed_messages(with_categories=false) %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for msg in messages %}
-            <li>{{ msg }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+{% block content %}
+<div class="container" style="margin-top: 40px;">
+  <div class="box" style="max-width: 800px; margin: auto; padding: 30px;">
+
+    <h1 class="title has-text-centered">Reserve a Seat</h1>
 
     <form method="POST">
-      <label>First name: <input name="first_name" required></label><br>
-      <label>Last name: <input name="last_name" required></label><br>
-      <label>Row (1-12): <input name="seat_row" type="number" min="1" max="12" required></label><br>
-      <label>Column (1-4): <input name="seat_col" type="number" min="1" max="4" required></label><br>
-      <button type="submit">Reserve Seat</button>
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">First Name</label>
+            <div class="control">
+              <input class="input" name="first_name" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="field">
+            <label class="label">Last Name</label>
+            <div class="control">
+              <input class="input" name="last_name" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">Row (1-12)</label>
+            <div class="control">
+              <input class="input" name="seat_row" type="number" min="1" max="12" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="field">
+            <label class="label">Column (1-4)</label>
+            <div class="control">
+              <input class="input" name="seat_col" type="number" min="1" max="4" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field has-text-centered">
+        <button class="button is-primary is-medium" type="submit">
+          Reserve Seat
+        </button>
+      </div>
     </form>
 
-    <h2>Current Seating</h2>
-    <table class="chart">
-      <thead><tr><th>Row</th>{% for c in range(1, cols+1) %}<th>C{{c}}</th>{% endfor %}</tr></thead>
-      <tbody>
-      {% for r in range(0, rows) %}
-        <tr>
-          <td>{{ r+1 }}</td>
-          {% for c in range(0, cols) %}
-            {% set seat = chart[r][c] %}
-            <td class="{{ 'reserved' if seat.reserved else 'available' }}">
-              {% if seat.reserved %}
-                {{ seat.name }}<br>
-                <small>Occupied</small>
-              {% else %}
-                Available<br>
-                <small>${{ "%.2f"|format(cost_matrix[r][c]) }}</small>
-              {% endif %}
-            </td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <hr>
 
-  </main>
-</body>
-</html>
+    <h2 class="subtitle has-text-centered">Current Seating</h2>
+
+    <div class="table-container">
+      <table class="table is-bordered is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Row</th>
+            {% for c in range(1, cols + 1) %}
+              <th>C{{ c }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in range(0, rows) %}
+          <tr>
+            <td><strong>{{ r + 1 }}</strong></td>
+            {% for c in range(0, cols) %}
+              {% set seat = chart[r][c] %}
+              <td class="{{ 'has-background-danger-light' if seat.reserved else 'has-background-success-light' }}">
+                {% if seat.reserved %}
+                  <strong>{{ seat.name }}</strong><br>
+                  <small>Occupied</small>
+                {% else %}
+                  Available<br>
+                  <small>${{ "%.2f"|format(cost_matrix[r][c]) }}</small>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

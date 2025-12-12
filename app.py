@@ -135,7 +135,7 @@ def admin_dashboard():
         flash("Please log in as admin to view the dashboard.", "warning")
         return redirect(url_for("admin_login"))
 
-    chart = build_seating_chart()
+    seating_chart, revenue, reservations = build_seating_chart()
 
     # calculate total sales using cost matrix and reservations
     total = 0.0
@@ -146,7 +146,7 @@ def admin_dashboard():
         if 0 <= rr < ROWS and 0 <= cc < COLS:
             total += COST_MATRIX[rr][cc]
 
-    return render_template("admin_dashboard.html", chart=chart, reservations=reservations, total_sales=total)
+    return render_template("admin_dashboard.html", chart=seating_chart, reservations=reservations, total_sales=total)
 
 def generate_eticket(first, last, row, col):
     initials = (first[:1] + last[:1]).upper() if first and last else "XX"
@@ -161,7 +161,7 @@ def seat_is_taken(row, col):
 
 @app.route("/reserve", methods=["GET", "POST"])
 def reserve_seat():
-    chart = build_seating_chart()
+    seating_chart, revenue, reservations = build_seating_chart()
 
     if request.method == "POST":
         first = request.form.get("first_name", "").strip()
@@ -205,7 +205,7 @@ def reserve_seat():
 
     return render_template(
         "reserve.html",
-        chart=chart,
+        chart=seating_chart,
         rows=ROWS,
         cols=COLS,
         cost_matrix=COST_MATRIX
