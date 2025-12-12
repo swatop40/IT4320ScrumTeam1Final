@@ -44,17 +44,19 @@ COLS = 4
 
 def build_seating_chart():
     # Create empty 12x4 chart
-    seating_chart = [[{"reserved": False, "name": None} for col in range(4)] for row in range(12)]
+    seating_chart = [[{"reserved": False, "name": None} for _ in range(COLS)] for _ in range(ROWS)]
 
     # Load reservations from database
     reservations = Reservation.query.all()
 
     for r in reservations:
-        row = r.seatRow - 1   # convert to 0-based index
-        col = r.seatColumn - 1
+        row = int(r.seatRow) - 1   # convert to 0-based index
+        col = int(r.seatColumn) - 1
 
-        seating_chart[row][col]["reserved"] = True
-        seating_chart[row][col]["name"] = r.passengerName
+        # Safety check to avoid crashes
+        if 0 <= row < ROWS and 0 <= col < COLS:
+            seating_chart[row][col]["reserved"] = True
+            seating_chart[row][col]["name"] = r.passengerName
 
     return seating_chart
 
@@ -132,41 +134,54 @@ def seat_is_taken(row, col):
 @app.route("/reserve", methods=["GET", "POST"])
 def reserve_seat():
     chart = build_seating_chart()
+
     if request.method == "POST":
         first = request.form.get("first_name", "").strip()
         last = request.form.get("last_name", "").strip()
+
         try:
             row = int(request.form.get("seat_row"))
             col = int(request.form.get("seat_col"))
         except (ValueError, TypeError):
-            flash("Row and Column must be numbers.", "danger")
+            flash("Row and Column must be numbers.")
             return redirect(url_for("reserve_seat"))
 
         # validation
         if not first or not last:
-            flash("Please provide both first and last name.", "danger")
+            flash("Please provide both first and last name.")
             return redirect(url_for("reserve_seat"))
 
         if not (1 <= row <= ROWS and 1 <= col <= COLS):
-            flash("Selected seat is out of range.", "danger")
+            flash("Selected seat is out of range.")
             return redirect(url_for("reserve_seat"))
 
         if seat_is_taken(row, col):
-            flash(f"Seat R{row}C{col} is already reserved. Choose another seat.", "warning")
+            flash(f"Seat R{row}C{col} is already reserved. Choose another seat.")
             return redirect(url_for("reserve_seat"))
 
         eticket = generate_eticket(first, last, row, col)
         created = datetime.utcnow().isoformat()
-        new_res = Reservation(passengerName=f"{first} {last}",
-                              seatRow=row, seatColumn=col,
-                              eTicketNumber=eticket,
-                              created=created)
+
+        new_res = Reservation(
+            passengerName=f"{first} {last}",
+            seatRow=row,
+            seatColumn=col,
+            eTicketNumber=eticket,
+            created=created
+        )
+
         db.session.add(new_res)
         db.session.commit()
-        flash(f"Reservation successful! eTicket: {eticket}", "success")
+
         return redirect(url_for("confirm_reservation", eticket=eticket))
 
-    return render_template("reserve.html", chart=chart, rows=ROWS, cols=COLS, cost_matrix=COST_MATRIX)
+    return render_template(
+        "reserve.html",
+        chart=chart,
+        rows=ROWS,
+        cols=COLS,
+        cost_matrix=COST_MATRIX
+    )
 
 
 
